@@ -10,17 +10,17 @@
 <body>
   <header class="container mt-3">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-      <a class="navbar-brand" href="url_for('index')">TINYSTEPS</a>
+      <a class="navbar-brand" href="{{url_for('index')}}">TINYSTEPS</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav">
           <li class="nav-item active">
-            <a class="nav-link" href="url_for('techers')">Все репетиторы</a>
+            <a class="nav-link" href="{{url_for('techers')}}">Все репетиторы</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="url_for('request')">Заявка на подбор</a>
+            <a class="nav-link" href="{{url_for('request')}}">Заявка на подбор</a>
           </li>
         </ul>
       </div>
@@ -34,11 +34,10 @@
     <h1 class="h1 text-center mx-auto mt-4 py-5"><strong>Найдите идеального <br>репетитора английского, <br>занимайтесь онлайн</strong></h1>
     <div class="text-center mb-5">
       <div class="btn-group mx-auto mb-0" role="group" aria-label="Basic example">
-        {% for key in all_data[0] if index.count < 6 %}
+        {% for key in all_data[0] %}  {# выводим 6 репетиторов #}
+
         <a href="{{ url_for('goals', goal=key) }}" class="btn btn-outline-secondary">{{ all_data[0][key] }}</a>
-<!--        <a href="goal.html" class="btn btn-outline-secondary">🏫 Для школы</a>-->
-<!--        <a href="goal.html" class="btn btn-outline-secondary">🏢 Для работы</a>-->
-<!--        <a href="goal.html" class="btn btn-outline-secondary">🚜 Для переезда</a>-->
+
         {% endfor %}
       </div>
     </div>
@@ -47,7 +46,7 @@
       <div class="col-12 col-lg-10 offset-lg-1 m-auto">
 
         {% for teacher in all_data[1] %}
-
+        {% if loop.index < 7 %}
         <div class="card mb-4">
           <div class="card-body">
             <div class="row">
@@ -56,14 +55,12 @@
                 <p class="float-right">Рейтинг: {{ teacher['rating'] }} Ставка: {{ teacher['price'] }} / час</p>
                 <h2 class="h4">{{ teacher['name'] }}</h2>
                 <p>{{ teacher['about'] }}</p>
-
                 <a href="{{url_for('profiles', id_techers=teacher['id'])}}" class="btn btn-outline-primary btn-sm mr-3 mb-2">Показать информаци и расписание</a>
-
               </div>
             </div>
           </div>
         </div>
-
+        {% endif %}
         {% endfor %}
 
       </div>

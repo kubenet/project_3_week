@@ -9,7 +9,12 @@ app = Flask(__name__)
 with open('data.json', 'r') as r:
     all_data = json.load(r)
     r.close()
-# #print(all_data[0])
+    for day in all_data[1][0]['free']:
+        print(day)
+        for key in all_data[1][0]['free'][day]:
+            if all_data[1][0]['free'][day][key]:
+                print(key)
+
 # for key in all_data[1]:
 #     if 'work' in key['goals']:
 #         print(key['name'])
