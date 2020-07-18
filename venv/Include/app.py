@@ -9,14 +9,18 @@ app = Flask(__name__)
 with open('data.json', 'r') as r:
     all_data = json.load(r)
     r.close()
-#print(all_data[0])
-for key in all_data[1]:
-    if 'work' in key['goals']:
-        print(key['name'])
+# #print(all_data[0])
+# for key in all_data[1]:
+#     if 'work' in key['goals']:
+#         print(key['name'])
 
 @app.route('/') # главная
 def index():
     return render_template("index.html", all_data=all_data)
+
+@app.route('/techers/') # все репетиторы
+def techers():
+    return render_template("techers.html", all_data=all_data)
 
 @app.route('/goals/<goal>/')    # здесь будет цель <goal>
 def goals(goal):
@@ -30,7 +34,7 @@ def profiles(id_techers):
 def request():
     return render_template("request.html")
 
-@app.route('/request_done/')    # заявка на подбор отправлена
+@app.route('/request_done/', methods=['POST'])    # заявка на подбор отправлена
 def request_done():
     return render_template("request_done.html")
 
