@@ -13,11 +13,11 @@ with open('data.json', 'r') as r:
 
 # Запись нового запроса в файл all_requests.json
 def add_request(name, phone, goal, times):
-    with open('all_requests.json', 'r') as r:
+    with open('requests.json', 'r') as r:
         records = json.load(r)
     records.append({'name': name, 'phone': phone, 'goal': goal, 'times': times})
     r.close()
-    with open('all_requests.json', 'w') as w:
+    with open('requests.json', 'w') as w:
         json.dump(records, w)
     w.close()
 
@@ -28,7 +28,9 @@ def update_timtale_teacher(id_teacher, day, times):
         records = json.load(r)
         records[1][int(id_teacher)]['free'][day][times] = False
         r.close()
-
+    with open('booking.json', 'w') as b:
+        json.dump(records, b)
+        b.close()
     with open('data.json', 'w') as w:
         json.dump(records, w)
         w.close()
@@ -38,19 +40,13 @@ def update_timtale_teacher(id_teacher, day, times):
         r.close()
 
 
-def update_data():
-    with open('data.json', 'r') as r:
-        global all_data
-        all_data = json.load(r)
-        r.close()
-    # for day in all_data[1][0]['free']:
-    #     print(day)
-    #     for key in all_data[1][0]['free'][day]:
-    #         if all_data[1][0]['free'][day][key]:
-    #             print(key)
+# def update_data():
+#     with open('data.json', 'r') as r:
+#         global all_data
+#         all_data = json.load(r)
+#         r.close()
 
-
-update_data()
+# update_data()
 
 
 class RequestForm(FlaskForm):  # объявление класса формы для WTForms
@@ -73,17 +69,17 @@ def techers():
     return render_template("techers.html", all_data=all_data)
 
 
-@app.route('/goals/<goal>/')  # здесь будет цель <goal>
+@app.route('/goals/<goal>/')  # цель 'goal'
 def goals(goal):
     return render_template("goals.html", goal=goal, all_data=all_data)
 
 
-@app.route('/profiles/<int:id_techers>/')  # здесь будет преподаватель <id учителя>
+@app.route('/profiles/<int:id_techers>/')  # профиль репетитора <id учителя>
 def profiles(id_techers):
     return render_template("profiles.html", id_techers=id_techers, all_data=all_data)
 
 
-@app.route('/requests/')  # здесь будет заявка на подбор
+@app.route('/requests/')  #  заявка на подбор репетитора
 def requests():
     ReqForm = RequestForm()  # Форма для страницы ('/request')
     return render_template("request.html", form=ReqForm, all_data=all_data)
@@ -113,17 +109,18 @@ def booking(id_techers, day, time):
 
 @app.route('/booking_done/', methods=['POST'])  # заявка отправлена
 def booking_done():
+    # получаем даныне из формы
     clientWeekday = request.form["clientWeekday"]
     clientTime = request.form["clientTime"]
     clientTeacher = request.form["clientTeacher"]
     clientName = request.form["clientName"]
     clientPhone = request.form["clientPhone"]
 
-    update_timtale_teacher(clientTeacher, clientWeekday,
-                           clientTime)  # Обновляем расписание свободного времени репетитора
-    update_data()
+    # Обновляем расписание свободного времени репетитора
+    update_timtale_teacher(clientTeacher, clientWeekday, clientTime)
+    # обновляем данные в файле json
+#    update_data()
     return render_template("booking_done.html", clientName=clientName, clientPhone=clientPhone, clientTime=clientTime,
                            clientTeacher=clientTeacher, clientWeekday=clientWeekday)
-
 
 app.run('0.0.0.0', debug=True)
