@@ -1,7 +1,7 @@
 import json
 from flask import Flask, render_template, request
 from flask_wtf import FlaskForm
-from wtforms import RadioField, TextField
+from wtforms import RadioField, StringField
 
 app = Flask(__name__)
 app.secret_key = 'key'
@@ -40,18 +40,9 @@ def update_timtale_teacher(id_teacher, day, times):
         r.close()
 
 
-# def update_data():
-#     with open('data.json', 'r') as r:
-#         global all_data
-#         all_data = json.load(r)
-#         r.close()
-
-# update_data()
-
-
 class RequestForm(FlaskForm):  # объявление класса формы для WTForms
-    name = TextField('name')
-    phone = TextField('phone')
+    name = StringField('name')
+    phone = StringField('phone')
     goal = RadioField("Какая цель занятий?", choices=[('0', 'Для путешествий'), ('1', 'Для школы'), ('2', 'Для работы'),
                                                       ('3', 'Для переезда')])
     time = RadioField("Сколько времени есть?",
@@ -81,8 +72,8 @@ def profiles(id_techers):
 
 @app.route('/requests/')  #  заявка на подбор репетитора
 def requests():
-    ReqForm = RequestForm()  # Форма для страницы ('/request')
-    return render_template("request.html", form=ReqForm, all_data=all_data)
+    form_request = RequestForm()  # Форма для страницы ('/request')
+    return render_template("request.html", form=form_request, all_data=all_data)
 
 
 @app.route('/request_done/', methods=['POST'])  # заявка на подбор отправлена
@@ -98,8 +89,8 @@ def request_done():
                     '3': '7-10 часов в неделю'}
 
     add_request(name, phone, goal_choices[goal], time_choices[times])
-    return render_template("request_done.html", username=name, userphone=phone, goal=goal_choices[goal],
-                           time=time_choices[times])
+    return render_template("request_done.html", username=name, userphone=phone,
+                           goal=goal_choices[goal], time=time_choices[times])
 
 
 @app.route('/booking/<int:id_techers>/<day>/<time>/')  # здесь будет форма бронирования <id учителя>
@@ -110,17 +101,15 @@ def booking(id_techers, day, time):
 @app.route('/booking_done/', methods=['POST'])  # заявка отправлена
 def booking_done():
     # получаем даныне из формы
-    clientWeekday = request.form["clientWeekday"]
-    clientTime = request.form["clientTime"]
-    clientTeacher = request.form["clientTeacher"]
-    clientName = request.form["clientName"]
-    clientPhone = request.form["clientPhone"]
-
+    client_weekday = request.form["clientWeekday"]
+    client_time = request.form["clientTime"]
+    client_teacher = request.form["clientTeacher"]
+    client_name = request.form["clientName"]
+    client_phone = request.form["clientPhone"]
     # Обновляем расписание свободного времени репетитора
-    update_timtale_teacher(clientTeacher, clientWeekday, clientTime)
-    # обновляем данные в файле json
-#    update_data()
-    return render_template("booking_done.html", clientName=clientName, clientPhone=clientPhone, clientTime=clientTime,
-                           clientTeacher=clientTeacher, clientWeekday=clientWeekday)
+    update_timtale_teacher(client_teacher, client_weekday, client_time)
+    return render_template("booking_done.html", clientName=client_name, clientPhone=client_phone,
+                           clientTime=client_time, clientTeacher=client_teacher, clientWeekday=client_weekday)
+
 
 app.run('0.0.0.0', debug=True)
