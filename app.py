@@ -13,31 +13,40 @@ with open('data.json', 'r') as r:
 
 # Запись нового запроса в файл all_requests.json
 def add_request(name, phone, goal, times):
-    with open('requests.json', 'r') as r:
-        records = json.load(r)
+    with open('requests.json', 'r') as read_json:
+        records = json.load(read_json)
     records.append({'name': name, 'phone': phone, 'goal': goal, 'times': times})
-    r.close()
-    with open('requests.json', 'w') as w:
-        json.dump(records, w)
-    w.close()
+    read_json.close()
+    with open('requests.json', 'w') as write_json:
+        json.dump(records, write_json)
+        write_json.close()
 
 
 # Запись нового запроса в файл all_requests.json
-def update_timtale_teacher(id_teacher, day, times):
-    with open('data.json', 'r') as r:
-        records = json.load(r)
+def update_timetale_teacher(id_teacher, day, times, client_name, client_phone):
+    with open('data.json', 'r') as read_json:
+        records = json.load(read_json)
         records[1][int(id_teacher)]['free'][day][times] = False
-        r.close()
-    with open('booking.json', 'w') as b:
-        json.dump(records, b)
-        b.close()
+        read_json.close()
+
     with open('data.json', 'w') as w:
         json.dump(records, w)
         w.close()
+
     with open('data.json', 'r') as r:
         global all_data
         all_data = json.load(r)
         r.close()
+
+    with open('booking.json', 'r') as read_booking:
+        records = json.load(read_booking)
+        records.append([id_teacher, day, times, client_name, client_phone])
+        read_booking.close()
+        with open('booking.json', 'w') as write_booking:
+            json.dump(records, write_booking)
+            write_booking.close()
+
+
 
 
 class RequestForm(FlaskForm):  # объявление класса формы для WTForms
@@ -106,8 +115,10 @@ def booking_done():
     client_teacher = request.form["clientTeacher"]
     client_name = request.form["clientName"]
     client_phone = request.form["clientPhone"]
+
     # Обновляем расписание свободного времени репетитора
-    update_timtale_teacher(client_teacher, client_weekday, client_time)
+    update_timetale_teacher(client_teacher, client_weekday, client_time, client_name, client_phone)
+
     return render_template("booking_done.html", clientName=client_name, clientPhone=client_phone,
                            clientTime=client_time, clientTeacher=client_teacher, clientWeekday=client_weekday)
 
